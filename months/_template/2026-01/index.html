@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Monthversary Terminal 💘</title>
+  <style>
+    :root { --bg:#070a0f; --panel:#0b1220; --text:#d7e2ff; --muted:#8aa0d6; --green:#39ff88; --red:#ff5c7a; }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      background: radial-gradient(1200px 700px at 20% 10%, #132044 0%, var(--bg) 55%);
+      color:var(--text); min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
+    }
+    .wrap{width:min(900px, 100%);}
+    .top{
+      display:flex; align-items:center; gap:10px; color:var(--muted); margin-bottom:12px;
+      font-size:13px;
+    }
+    .dot{width:10px;height:10px;border-radius:50%;}
+    .r{background:#ff5f57}.y{background:#febc2e}.g{background:#28c840}
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:18px;
+      box-shadow: 0 18px 60px rgba(0,0,0,.45);
+      overflow:hidden;
+    }
+    .header{
+      background: rgba(0,0,0,.25);
+      padding:14px 16px;
+      display:flex; align-items:center; justify-content:space-between;
+      border-bottom:1px solid rgba(255,255,255,.10);
+    }
+    .title{display:flex; align-items:center; gap:10px;}
+    .badge{
+      font-size:12px; color:var(--muted);
+      border:1px solid rgba(255,255,255,.14);
+      padding:6px 10px; border-radius:999px;
+      background: rgba(0,0,0,.18);
+    }
+    .body{padding:18px 16px 10px;}
+    .screen{
+      background: rgba(0,0,0,.35);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:14px;
+      padding:14px;
+      min-height:360px;
+      white-space:pre-wrap;
+      line-height:1.45;
+      font-size:14px;
+    }
+    .prompt{color:var(--green)}
+    .cmd{color:var(--text)}
+    .hint{color:var(--muted)}
+    .error{color:var(--red)}
+    .footer{
+      padding:12px 16px 16px;
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between;
+      color:var(--muted); font-size:12px;
+    }
+    input{
+      width:100%;
+      margin-top:10px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.28);
+      color:var(--text);
+      padding:12px 12px;
+      outline:none;
+      font-family: inherit;
+      font-size:14px;
+    }
+    .kbd{
+      border:1px solid rgba(255,255,255,.18);
+      padding:2px 6px;
+      border-radius:8px;
+      background: rgba(0,0,0,.25);
+      color:var(--text);
+    }
+    a{color:var(--text)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+      <span>secure session established · monthversary build</span>
+    </div>
+
+    <div class="card">
+      <div class="header">
+        <div class="title">
+          <div style="font-weight:700">💻 love.exe</div>
+          <div class="badge">type <span class="kbd">help</span> to begin</div>
+        </div>
+        <div class="badge" id="dateBadge"></div>
+      </div>
+
+      <div class="body">
+        <div class="screen" id="screen"></div>
+        <input id="input" autocomplete="off" spellcheck="false" placeholder="Enter command (try: help, our-story, reasons, playlist, open-gift)" />
+      </div>
+
+      <div class="footer">
+        <div>Made with ❤️ + caffeine</div>
+        <div class="hint">Tip: try <span class="kbd">secret</span> 😌</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // ✅ Customize these
+  const DATA = {
+    boyfriendName: "Babe",
+    fromName: "Gauri",
+    monthCount: "1 month",
+    story: [
+      "We met and something clicked.",
+      "Then you became my favourite notification.",
+      "And somehow… home started sounding like your voice."
+    ],
+    reasons: [
+      "You make life feel lighter.",
+      "You’re calm when I spiral.",
+      "Your hugs feel like a safe place.",
+      "You’re ambitious, and it makes me want to level up too.",
+      "You’re my favourite person. Consistently."
+    ],
+    playlistLinkText: "Open our playlist",
+    playlistUrl: "https://open.spotify.com/",
+    giftLine: "Your gift: a promise — more effort, more softness, more us.",
+    closing: "Happy monthversary. I’m proud of us."
+  };
+
+  const screen = document.getElementById("screen");
+  const input = document.getElementById("input");
+  document.getElementById("dateBadge").textContent =
+    new Date().toLocaleString(undefined, { weekday:"short", year:"numeric", month:"short", day:"numeric" });
+
+  const state = { booted:false };
+
+  function line(txt="", cls="") {
+    const span = document.createElement("div");
+    span.className = cls;
+    span.textContent = txt;
+    screen.appendChild(span);
+    screen.scrollTop = screen.scrollHeight;
+  }
+
+  function typeLines(lines, cls="", delay=18) {
+    return new Promise(async (res) => {
+      for (const l of lines) {
+        await typeLine(l, cls, delay);
+      }
+      res();
+    });
+  }
+
+  function typeLine(text, cls="", delay=18) {
+    return new Promise((res) => {
+      const div = document.createElement("div");
+      div.className = cls;
+      screen.appendChild(div);
+      let i = 0;
+      const t = setInterval(() => {
+        div.textContent = text.slice(0, i++);
+        screen.scrollTop = screen.scrollHeight;
+        if (i > text.length) { clearInterval(t); res(); }
+      }, delay);
+    });
+  }
+
+  async function boot() {
+    if (state.booted) return;
+    state.booted = true;
+    await typeLines([
+      `Initializing love.exe…`,
+      `Loading module: ${DATA.monthCount} anniversary`,
+      `Authenticating user: ${DATA.boyfriendName}`,
+      `Status: ✅ secure`,
+      ``,
+      `Hi ${DATA.boyfriendName}.`,
+      `This is ${DATA.fromName}'s tiny website for you.`,
+      `Type 'help' to explore.`
+    ], "hint", 14);
+    line("");
+    prompt();
+  }
+
+  function prompt() {
+    line(`${DATA.boyfriendName.toLowerCase()}@love:~$ `, "prompt");
+  }
+
+  function help() {
+    line("Commands:", "hint");
+    line("  help        - show commands", "hint");
+    line("  our-story   - a short timeline", "hint");
+    line("  reasons     - why I adore you", "hint");
+    line("  playlist    - something to play", "hint");
+    line("  open-gift   - reveal the gift line", "hint");
+    line("  secret      - ???", "hint");
+  }
+
+  async function ourStory() {
+    await typeLines(["Our story:"], "hint", 12);
+    for (let i=0;i<DATA.story.length;i++) {
+      await typeLine(`  ${i+1}. ${DATA.story[i]}`, "cmd", 10);
+    }
+  }
+
+  async function reasons() {
+    await typeLines([`Reasons I choose you (every day):`], "hint", 12);
+    for (const r of DATA.reasons) await typeLine(`  • ${r}`, "cmd", 10);
+  }
+
+  function playlist() {
+    line(`${DATA.playlistLinkText}: ${DATA.playlistUrl}`, "cmd");
+  }
+
+  async function openGift() {
+    await typeLine("Decrypting…", "hint", 14);
+    await typeLine(DATA.giftLine, "cmd", 12);
+    await typeLine(DATA.closing, "cmd", 12);
+  }
+
+  async function secret() {
+    await typeLine("Easter egg unlocked 🔓", "hint", 14);
+    await typeLine(`If you ever doubt us: I’m not going anywhere.`, "cmd", 12);
+  }
+
+  async function runCommand(raw) {
+    const cmd = raw.trim().toLowerCase();
+    if (!cmd) return;
+
+    // echo input
+    line(`> ${raw}`, "cmd");
+
+    if (cmd === "help") help();
+    else if (cmd === "our-story") await ourStory();
+    else if (cmd === "reasons") await reasons();
+    else if (cmd === "playlist") playlist();
+    else if (cmd === "open-gift") await openGift();
+    else if (cmd === "secret") await secret();
+    else line(`command not found: ${cmd}`, "error");
+
+    line("");
+    prompt();
+  }
+
+  input.addEventListener("keydown", async (e) => {
+    if (e.key === "Enter") {
+      const v = input.value;
+      input.value = "";
+      await runCommand(v);
+    }
+  });
+
+  boot();
+</script>
+</body>
+</html>
