@@ -263,6 +263,12 @@
       "You’re ambitious, and it makes me want to level up too.",
       "You’re my favourite person. Consistently."
     ],
+    together: [
+    "— paste your pointers here —",
+    "Example: Late-night drive + chai",
+    "Example: Cook pasta together",
+    "Example: Plan our next trip"
+  ],
     giftLine: "Your gift: a promise — more effort, more softness, more us.",
     closing: "Happy monthversary. I’m proud of us."
   };
@@ -326,6 +332,7 @@
     line("  help        - show commands", "hint");
     line("  our-story   - a short timeline", "hint");
     line("  reasons     - why I adore you", "hint");
+    line("  together    - things to do when we’re together", "hint");
     line("  open-gift   - reveal the gift line", "hint");
     line("  try-me      - BOOM mode", "hint");
     line("  secret      - ???", "hint");
@@ -340,6 +347,14 @@
     await typeLine("Reasons I choose you (every day):", "hint", 12);
     for (const r of DATA.reasons) await typeLine(`  • ${r}`, "cmd", 10);
   }
+
+  async function together() {
+  await typeLine("Things to do when we’re together:", "hint", 12);
+  for (const t of DATA.together) {
+    await typeLine(`  ☐ ${t}`, "cmd", 10);
+  }
+}
+
 
   async function openGift() {
     await typeLine("Decrypting…", "hint", 12);
@@ -361,6 +376,7 @@
     if (cmd === "help") help();
     else if (cmd === "our-story") await ourStory();
     else if (cmd === "reasons") await reasons();
+    else if (cmd === "together" || cmd === "things-to-do") await together();
     else if (cmd === "open-gift") await openGift();
     else if (cmd === "secret") await secret();
     else if (cmd === "try-me") boomLove();
